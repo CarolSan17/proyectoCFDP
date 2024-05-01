@@ -1,0 +1,40 @@
+Conclusiones:
+
+1. Lo aprendido durante el desarrollo del proyecto: 
+
+Principalemente tener en cuenta la importancia en
+el orden y la lógica en cada uno de los procesos
+cuando se realiza un proyecto, de nombrar cada
+uno de las variables que afectan dicho proyecto,
+analizar y dar un sentido lógico a los procesos,
+ya que el programa ejecutará exactamente lo
+solicitado por el hombre. Y en si, conocer el
+programa Java y las tecnicas princiopales para
+elaborar un proyecto, en este caso con Eclipse. 
+
+2. Posibles aplicaciones en su vida profesional
+de las destrezas y conocimientos adquiridos y
+practicados durante el desarrollo del proyecto:
+	
+Definitivamente hay muchos procesos sencillos que
+se pueden implementar en nuestra gestión laboral,
+teniendo en cuenta el orden para llevarlos a cabo.
+
+3. Las dificultades presentadas durante el desarrollo
+del proyecto: 
+
+Principalemente el poco conocimiento del software de
+Java, ya que aprender desde cero su funcionalidad,
+las técnicas, las librerías, los metodos y demás
+temás basicos para conocer como funciona, fue complejo
+para lograr que se ejecutará el proyecto. 
+La poca colaboración de algunos compañeros, quienes
+también eran principiantes para programar en Java y
+no tenían la suficiente disposición en aportar para
+elaborar el código solicitado.
+
+
+Estudiantes: 
+Carolina Sanchez Sanchez
+Mónica Andrea Moreno
+	
