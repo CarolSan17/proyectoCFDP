@@ -1,0 +1,136 @@
+package ProjectCFDP;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+public class SalesReport {
+    
+    public static void main(String[] args) {
+
+        String datosProductos = "C:\\Users\\Carolina\\OneDrive\\Escritorio\\DatosProductos_1.txt";
+        String datosVendedores = "C:\\Users\\Carolina\\OneDrive\\Escritorio\\DatosVendedores_1.txt";
+        String[] archivosVentas = {
+            "C:\\Users\\Carolina\\OneDrive\\Escritorio\\CC_1121839069.txt",
+            "C:\\Users\\Carolina\\OneDrive\\Escritorio\\CC_1233910348.txt",
+            "C:\\Users\\Carolina\\OneDrive\\Escritorio\\CC_1214734453.txt",
+            "C:\\Users\\Carolina\\OneDrive\\Escritorio\\CC_1000775434.txt"
+        };
+
+        Map<String, Double> preciosProductos = leerPreciosProductos(datosProductos);
+        
+        Map<String, Double> ventasPorVendedor = new TreeMap<>();
+        Map<String, Double> ventasPorVendedorDescendente = new TreeMap<>(new Comparator<String>() {
+            @Override
+            public int compare(String vendedor1, String vendedor2) {
+                return ventasPorVendedor.getOrDefault(vendedor2, 0.0).compareTo(ventasPorVendedor.getOrDefault(vendedor1, 0.0));
+            }
+        });
+        
+        Map<String, Integer> ventasPorProducto = new HashMap<>();
+        
+        for (String archivo : archivosVentas) {
+            leerArchivoVentas(archivo, preciosProductos, ventasPorVendedor, ventasPorProducto);
+        }
+        
+        generarReporteVentasPorVendedor(ventasPorVendedor);
+        generarReporteProductosMasVendidos(datosProductos, ventasPorProducto);
+    }
+    
+    public static Map<String, Double> leerPreciosProductos(String filename) {
+        Map<String, Double> preciosProductos = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] partes = line.split(";");
+                String codigoProducto = partes[0].trim();
+                double precio = Double.parseDouble(partes[2].trim());
+                preciosProductos.put(codigoProducto, precio);
+            }
+        } catch (IOException e) {
+            System.err.println("Hubo un error con el archivo de productos: " + e.getMessage());
+        }
+        return preciosProductos;
+    }
+    
+    public static void leerArchivoVentas(String filename, Map<String, Double> preciosProductos, Map<String, Double> ventasPorVendedor, Map<String, Integer> ventasPorProducto) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String cedulaVendedor = reader.readLine().trim();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] partes = line.split(";");
+                String codigoProducto = partes[0].trim();
+                int cantidad = Integer.parseInt(partes[1].trim());
+                double precioProducto = preciosProductos.getOrDefault(codigoProducto, 0.0);
+                double venta = precioProducto * cantidad;
+                ventasPorVendedor.put(cedulaVendedor, ventasPorVendedor.getOrDefault(cedulaVendedor, 0.0) + venta);
+                ventasPorProducto.put(codigoProducto, ventasPorProducto.getOrDefault(codigoProducto, 0) + cantidad);
+            }
+        } catch (IOException e) {
+            System.err.println("Hubo un error con el archivo de ventas " + filename + ": " + e.getMessage());
+        }
+    }
+    
+    public static void generarReporteVentasPorVendedor(Map<String, Double> ventasPorVendedor) {
+        System.out.println("Reporte de Ventas por Vendedor:");
+        System.out.println("--------------------------------");
+        ventasPorVendedor.entrySet().stream()
+            .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+            .forEachOrdered(entry -> System.out.println("Vendedor: " + entry.getKey() + ", Total de ventas: $" + entry.getValue()));
+    }
+    
+    public static void generarReporteProductosMasVendidos(String datosProductos, Map<String, Integer> ventasPorProducto) {
+        TreeMap<String, Integer> productosMasVendidos = new TreeMap<>(new Comparator<String>() {
+            @Override
+            public int compare(String producto1, String producto2) {
+                return ventasPorProducto.get(producto2).compareTo(ventasPorProducto.get(producto1));
+            }
+        });
+        
+        productosMasVendidos.putAll(ventasPorProducto);
+        
+        System.out.println("Productos más vendidos:");
+        System.out.println("-----------------------");
+        for (Map.Entry<String, Integer> entry : productosMasVendidos.entrySet()) {
+            String nombreProducto = obtenerNombreProducto(entry.getKey(), datosProductos);
+            double precioProducto = obtenerPrecioProducto(entry.getKey(), datosProductos);
+            System.out.println("Producto: " + nombreProducto + ", Precio: $" + precioProducto + ", Cantidad vendida: " + entry.getValue());
+        }
+    }
+    
+    public static String obtenerNombreProducto(String codigoProducto, String datosProductos) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(datosProductos))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] partes = line.split(";");
+                String codigo = partes[0].trim();
+                if (codigo.equals(codigoProducto)) {
+                    return partes[1].trim();
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Hubo un error con el archivo de productos: " + e.getMessage());
+        }
+        return "Producto no encontrado";
+    }
+    
+    public static double obtenerPrecioProducto(String codigoProducto, String datosProductos) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(datosProductos))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] partes = line.split(";");
+                String codigo = partes[0].trim();
+                if (codigo.equals(codigoProducto)) {
+                    return Double.parseDouble(partes[2].trim());
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Hubo un error con el archivo de productos: " + e.getMessage());
+        }
+        return 0.0;
+    }
+}
